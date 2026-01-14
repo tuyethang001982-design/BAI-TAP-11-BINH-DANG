@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm tra: Phát hiện quy định Pháp luật</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #f43f5e;
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body {
+            background: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Quicksand', sans-serif;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .slide-container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            border-radius: 40px;
+            box-shadow: var(--shadow);
+            display: none;
+            flex-direction: column;
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .slide-container.active { display: flex; animation: slideUp 0.6s ease-out; }
+
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px) scale(0.95); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+
+        .blob {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            filter: blur(80px);
+            opacity: 0.2;
+            z-index: -1;
+            border-radius: 50%;
+        }
+        .blob-1 { top: -100px; left: -100px; background: var(--primary); }
+        .blob-2 { bottom: -100px; right: -100px; background: var(--secondary); }
+
+        h1 { 
+            font-family: 'Montserrat', sans-serif; 
+            font-weight: 800;
+            font-size: 38px; 
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+
+        .slide-title { 
+            font-size: 16px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            color: #64748b;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        h3 { 
+            font-size: 24px; 
+            color: #0f172a; 
+            margin-bottom: 30px; 
+            line-height: 1.5;
+            font-weight: 700;
+        }
+
+        .input-group {
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 18px 25px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            font-size: 18px;
+            background: white;
+            outline: none;
+            font-family: inherit;
+        }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+        .options-grid { display: grid; gap: 15px; width: 100%; z-index: 1; }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 20px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .option-btn:hover:not(.disabled) { 
+            border-color: var(--primary); 
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        
+        /* Selected state instead of correct/wrong */
+        .option-btn.selected { 
+            background: var(--primary) !important; 
+            border-color: var(--primary) !important; 
+            color: white !important; 
+            box-shadow: 0 10px 15px rgba(79, 70, 229, 0.2);
+        }
+        
+        .option-btn.selected span { background: rgba(255,255,255,0.2) !important; color: white !important; }
+
+        .option-btn.disabled { cursor: default; }
+
+        .footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 30px; }
+
+        .btn-nav {
+            padding: 15px 35px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-prev { background: #f1f5f9; color: #64748b; }
+        .btn-next { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; 
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        .btn-next:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        .progress-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 8px;
+            background: #f1f5f9;
+            z-index: 20;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .score-badge {
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 100px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .leaderboard-container {
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .leaderboard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 5px;
+        }
+        .leaderboard-row:nth-child(even) { background: #f8fafc; }
+        .leaderboard-row.top { background: #eef2ff; border: 1px solid #c7d2fe; }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <!-- Login Slide -->
+    <div class="slide-container active" id="slide-0">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; z-index: 1;">
+            <div style="font-size: 80px; margin-bottom: 20px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));">⚖️</div>
+            <h1>BÀI KIỂM TRA PHÁP LUẬT</h1>
+            <p style="font-size: 20px; color: #64748b; margin-bottom: 40px; font-weight: 500;">Chủ đề: Bình đẳng trước pháp luật</p>
+            
+            <div class="input-group">
+                <input type="text" id="student-name" class="input-field" placeholder="Họ và tên của em...">
+            </div>
+            <div class="input-group">
+                <input type="text" id="student-class" class="input-field" placeholder="Lớp của em (Vd: 11A1)...">
+            </div>
+            
+            <button class="btn-nav btn-next" id="start-btn" style="padding: 20px 50px; font-size: 18px; margin-top: 10px;" onclick="startQuiz()">
+                Đang khởi tạo...
+            </button>
+        </div>
+    </div>
+
+    <!-- Questions will be injected here -->
+    <div id="quiz-slides"></div>
+
+    <!-- Result Slide -->
+    <div class="slide-container" id="slide-result">
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; font-weight: 700; color: var(--primary);">Đang vinh danh kết quả...</p>
+        </div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; overflow-y: auto;">
+            <div style="font-size: 70px; margin-top: 20px; filter: drop-shadow(0 10px 15px rgba(245, 158, 11, 0.4));">🏆</div>
+            <h1 id="final-status" style="margin-bottom: 5px;">THÀNH CÔNG!</h1>
+            <div class="score-badge" style="font-size: 28px; margin-bottom: 30px;">
+                Kết quả: <span id="final-score">0</span>/100 Điểm
+            </div>
+            
+            <h2 style="font-size: 22px; margin-top: 10px; color: #0f172a; font-weight: 800;">BẢNG VÀNG THÀNH TÍCH</h2>
+            
+            <div class="leaderboard-container" id="leaderboard-box">
+                <div id="leaderboard-body">
+                    <!-- Data here -->
+                </div>
+            </div>
+
+            <button class="btn-nav btn-next" style="margin-top: 40px; margin-bottom: 20px;" onclick="location.reload()">
+                <i class="fas fa-redo"></i> Thử thách lại
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'legal-quiz-v2';
+
+        let currentUser = null;
+        let score = 0;
+        let currentSlide = 0;
+        let studentInfo = { name: '', class: '' };
+        let userSelections = [];
+
+        const questions = [
+            { q: "Mọi công dân không bị phân biệt đối xử trong hưởng quyền và thực hiện nghĩa vụ là:", options: ["Bình đẳng về thu nhập", "Bình đẳng trước pháp luật", "Bình đẳng về sở thích", "Bình đẳng về nhu cầu"], correct: 1 },
+            { q: "Bất kỳ công dân nào vi phạm pháp luật đều phải bị xử lý là nội dung của:", options: ["Bình đẳng về quyền hạn", "Bình đẳng về trách nhiệm pháp lý", "Bình đẳng về địa vị xã hội", "Bình đẳng về nhu cầu"], correct: 1 },
+            { q: "Ưu tiên cộng điểm cho thí sinh vùng khó khăn nhằm mục đích:", options: ["Tạo sự bất bình đẳng", "Ban phát đặc quyền", "Đạt tới sự công bằng thực chất", "Làm sai lệch kết quả"], correct: 2 },
+            { q: "Quyền và nghĩa vụ của công dân là hai mặt:", options: ["Tách rời hoàn toàn", "Đối lập nhau", "Không tách rời", "Chỉ chọn một trong hai"], correct: 2 },
+            { q: "Mọi người đều phải nộp hồ sơ và phí như nhau khi đăng ký kinh doanh thể hiện:", options: ["Phiền hà hành chính", "Bình đẳng về thủ tục", "Sự bắt buộc vô lý", "Thiên vị giàu nghèo"], correct: 1 },
+            { q: "Lao động nam và nữ làm cùng việc phải có lương ngang nhau thể hiện:", options: ["Bình đẳng giới trong lao động", "Ưu tiên phụ nữ", "Sự hào phóng", "Bình đẳng về sức khỏe"], correct: 0 },
+            { q: "Công dân có quyền khiếu nại sai phạm của cơ quan nhà nước là thực hiện:", options: ["Tự do ngôn luận", "Bình đẳng trước pháp luật", "Tham gia quản lý nhà nước", "Cả B và C"], correct: 3 },
+            { q: "Bình đẳng về nghĩa vụ nộp thuế dựa trên:", options: ["Diện tích văn phòng", "Số lượng nhân viên", "Kết quả kinh doanh và loại hình", "Sở thích giám đốc"], correct: 2 },
+            { q: "Hành vi bao che cho người thân vi phạm pháp luật là vi phạm:", options: ["Bình đẳng trước pháp luật", "Quyền con người", "Bình đẳng đạo đức", "Nhu cầu cá nhân"], correct: 0 },
+            { q: "Trách nhiệm công dân khi thấy người khác bị phân biệt đối xử là:", options: ["Lờ đi", "Lên tiếng phản đối và hỗ trợ", "Cổ vũ", "Chỉ quay phim"], correct: 1 }
+        ];
+
+        const quizContainer = document.getElementById('quiz-slides');
+        questions.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'slide-container';
+            slide.id = `slide-${index + 1}`;
+            slide.innerHTML = `
+                <div class="blob blob-1" style="opacity: 0.1"></div>
+                <span class="slide-title">Câu hỏi ${index + 1} / 10</span>
+                <h3>${item.q}</h3>
+                <div class="options-grid" id="options-${index}">
+                    ${item.options.map((opt, i) => `
+                        <button class="option-btn" onclick="window.selectAnswer(${index}, ${i}, this)">
+                            <span style="width: 32px; height: 32px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #64748b;">${String.fromCharCode(65 + i)}</span>
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="footer">
+                    <button class="btn-prev btn-nav" onclick="window.prevSlide()"><i class="fas fa-arrow-left"></i> Quay lại</button>
+                    <button class="btn-next btn-nav" id="next-btn-${index}" disabled onclick="window.nextSlide()">
+                        Tiếp tục <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            `;
+            quizContainer.appendChild(slide);
+        });
+
+        const slides = document.querySelectorAll('.slide-container');
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                document.getElementById('start-btn').innerText = "Bắt đầu bài thi 🚀";
+            } catch (err) { 
+                document.getElementById('start-btn').innerText = "Lỗi kết nối (Thử lại)";
+            }
+        }
+
+        onAuthStateChanged(auth, (u) => { currentUser = u; });
+        initAuth();
+
+        window.startQuiz = () => {
+            const name = document.getElementById('student-name').value.trim();
+            const cls = document.getElementById('student-class').value.trim();
+            if (!name || !cls) { alert("Em hãy nhập tên và lớp nhé!"); return; }
+            studentInfo = { name, class: cls };
+            window.nextSlide();
+        };
+
+        window.showSlide = (n) => {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[n].classList.add('active');
+            currentSlide = n;
+            document.getElementById('progress').style.width = (n / (slides.length - 1) * 100) + '%';
+            if (slides[n].id === 'slide-result') calculateAndSave();
+        };
+
+        window.nextSlide = () => window.showSlide(currentSlide + 1);
+        window.prevSlide = () => window.showSlide(currentSlide - 1);
+
+        window.selectAnswer = (qIdx, optIdx, btn) => {
+            const parent = document.getElementById(`options-${qIdx}`);
+            const allBtns = parent.querySelectorAll('.option-btn');
+            
+            // Toggle selection
+            allBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            
+            userSelections[qIdx] = optIdx;
+            document.getElementById(`next-btn-${qIdx}`).disabled = false;
+        };
+
+        async function calculateAndSave() {
+            if (!currentUser) return;
+            const loader = document.getElementById('loading-overlay');
+            loader.style.display = 'flex';
+            
+            // Calculate score at the end
+            score = 0;
+            questions.forEach((q, i) => {
+                if (userSelections[i] === q.correct) score += 10;
+            });
+            
+            document.getElementById('final-score').innerText = score;
+
+            try {
+                const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'scores');
+                await addDoc(collectionRef, {
+                    name: studentInfo.name,
+                    class: studentInfo.class,
+                    score: score,
+                    timestamp: Date.now()
+                });
+                await loadLeaderboard();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        async function loadLeaderboard() {
+            const body = document.getElementById('leaderboard-body');
+            body.innerHTML = '';
+            try {
+                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'scores'));
+                const snap = await getDocs(q);
+                let data = [];
+                snap.forEach(d => data.push(d.data()));
+                
+                data.sort((a, b) => b.score - a.score || a.timestamp - b.timestamp);
+                
+                data.slice(0, 5).forEach((item, i) => {
+                    const isTop = i === 0;
+                    body.innerHTML += `
+                        <div class="leaderboard-row ${isTop ? 'top' : ''}">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-weight: 800; width: 25px; color: ${isTop ? 'var(--accent)' : '#94a3b8'}">${i+1}</span>
+                                <div>
+                                    <div style="font-weight: 700;">${item.name}</div>
+                                    <div style="font-size: 12px; color: #64748b;">${item.class}</div>
+                                </div>
+                            </div>
+                            <div style="font-weight: 800; color: var(--primary);">${item.score} đ</div>
+                        </div>
+                    `;
+                });
+            } catch (e) { console.error(e); }
+        }
+    </script>
+</body>
+</html>
